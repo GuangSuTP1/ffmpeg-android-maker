@@ -22,7 +22,6 @@ jobs:
       #静态链接必须在执行编译脚本之前修改
       - name: Force static linking (must run before ./ffmpeg-android-maker.sh)
         run: |
-          # 在 build.sh 中的 FFMPEG_CONFIG_ARGS 末尾追加静态链接参数
           sed -i '/FFMPEG_CONFIG_ARGS=/ s/$/ --disable-shared --enable-static --extra-ldflags="-static-libgcc -static-libstdc++"/' scripts/ffmpeg/build.sh
 
       - name: Executing the script
