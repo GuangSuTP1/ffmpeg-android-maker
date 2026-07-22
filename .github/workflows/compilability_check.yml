@@ -8,14 +8,26 @@ jobs:
         abi: [ "armeabi-v7a", "arm64-v8a", "x86", "x86_64" ]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4   # 修正版本
 
       - name: Setup the environment
         run: |
-          sudo apt install meson nasm ninja-build
+          sudo apt update
+          sudo apt install meson nasm ninja-build -y
+
+      - name: Enable MediaCodec and JNI support
+        run: |
+          # 在 build.sh 中的 FFMPEG_CONFIG_ARGS 末尾追加硬解参数
+          sed -i '/FFMPEG_CONFIG_ARGS=/ s/$/ --enable-jni --enable-mediacodec/' scripts/ffmpeg/build.sh
 
       - name: Executing the script
         run: |
           export ANDROID_SDK_HOME=$ANDROID_HOME
           export ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME
-          ./ffmpeg-android-maker.sh -all-free -all-gpl -android=24 -abis=${{ matrix.abi }}
+          ./ffmpeg-android-maker.sh -all-free -all-gpl -mbedtls -android=24 -abis=${{ matrix.abi }}
+
+      - name: Upload binaries (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-${{ matrix.abi }}
+          path: output/**
