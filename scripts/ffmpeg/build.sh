@@ -27,7 +27,7 @@ DEP_LD_FLAGS="-L${BUILD_DIR_EXTERNAL}/${ANDROID_ABI}/lib $FFMPEG_EXTRA_LD_FLAGS"
 
 # Android 15 with 16 kb page size support
 # https://developer.android.com/guide/practices/page-sizes#compile-r27
-EXTRA_LDFLAGS="-Wl,-z,max-page-size=16384 $DEP_LD_FLAGS -static-libgcc -static-libstdc++"
+EXTRA_LDFLAGS="-Wl,-z,max-page-size=16384 $DEP_LD_FLAGS -Wl,--allow-multiple-definition"
 
 ./configure \
   --prefix=${BUILD_DIR_FFMPEG}/${ANDROID_ABI} \
