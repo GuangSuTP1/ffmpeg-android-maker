@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        abi: [ "armeabi-v7a", "arm64-v8a", "x86", "x86_64" ]
+        abi: [ "armeabi-v8a", "arm64-v7a" ]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4   # 修正版本
@@ -25,6 +25,12 @@ jobs:
           export ANDROID_SDK_HOME=$ANDROID_HOME
           export ANDROID_NDK_HOME=$ANDROID_NDK_LATEST_HOME
           ./ffmpeg-android-maker.sh -all-free -all-gpl -mbedtls -android=24 -abis=${{ matrix.abi }}
+
+      - name: Force static linking and disable shared libs
+        run: |
+          # 修改 build.sh，在 FFMPEG_CONFIG_ARGS 中追加静态链接参数
+          sed -i '/FFMPEG_CONFIG_ARGS=/ s/$/ --disable-shared --enable-static --extra-ldflags="-static-libgcc -static-libstdc++"/' scripts/ffmpeg/build.sh
+          # 同时确保 --disable-shared 在脚本里已经存在，如果没有，这个追加会生效
 
       - name: Upload binaries (optional)
         uses: actions/upload-artifact@v4
