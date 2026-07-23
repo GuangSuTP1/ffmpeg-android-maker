@@ -46,7 +46,7 @@ EXTRA_LDFLAGS="-Wl,-z,max-page-size=16384 -static-libstdc++ $DEP_LD_FLAGS"
   --extra-ldflags="$EXTRA_LDFLAGS" \
   --disable-shared \
   --enable-static \
-  --enable-ffmpeg
+  --enable-ffmpeg \
   --disable-vulkan \
   --pkg-config=${PKG_CONFIG_EXECUTABLE} \
   ${EXTRA_BUILD_CONFIGURATION_FLAGS} \
