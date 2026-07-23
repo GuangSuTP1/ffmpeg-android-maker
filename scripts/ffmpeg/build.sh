@@ -27,7 +27,15 @@ DEP_LD_FLAGS="-L${BUILD_DIR_EXTERNAL}/${ANDROID_ABI}/lib $FFMPEG_EXTRA_LD_FLAGS"
 
 # Android 15 with 16 kb page size support
 # https://developer.android.com/guide/practices/page-sizes#compile-r27
-EXTRA_LDFLAGS="-pie -Wl,-z,max-page-size=16384 -L${SYSROOT_PATH}/usr/lib/${TARGET_TRIPLE_MACHINE_ARCH}-linux-android/24 -Wl,-Bstatic -lc++_static -Wl,-Bdynamic -Wl,--allow-multiple-definition $DEP_LD_FLAGS"
+# Ensure libc++ is linked statically so the final ffmpeg executable does not depend on libc++_shared.so
+EXTRA_LDFLAGS="-pie -Wl,-z,max-page-size=16384 \
+  -L${SYSROOT_PATH}/usr/lib/${TARGET_TRIPLE_MACHINE_ARCH}-linux-android/24 \
+  -Wl,-Bstatic -lc++_static -Wl,-Bdynamic \
+  -Wl,--allow-multiple-definition $DEP_LD_FLAGS"
+
+# Optional: extra C++ flags (ensure position-independent code)
+EXTRA_CXXFLAGS="-O3 -fPIE -fPIC"
+
 ./configure \
   --prefix=${BUILD_DIR_FFMPEG}/${ANDROID_ABI} \
   --enable-cross-compile \
@@ -44,6 +52,7 @@ EXTRA_LDFLAGS="-pie -Wl,-z,max-page-size=16384 -L${SYSROOT_PATH}/usr/lib/${TARGE
   --strip=${FAM_STRIP} \
   --extra-cflags="-O3 -fPIE -fPIC $DEP_CFLAGS" \
   --extra-ldflags="$EXTRA_LDFLAGS" \
+  --extra-cxxflags="$EXTRA_CXXFLAGS" \
   --disable-shared \
   --enable-static \
   --enable-ffmpeg \
